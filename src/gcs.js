@@ -7,6 +7,15 @@ const gcs = new Cloud.Storage({
   projectId: config.google.project,
 });
 
+/**
+ * Uploads a file to Google Storage.
+ *
+ * @async
+ * @param {string} bucket     The name of the bucket to upload the file to.
+ * @param {string} fileName   The name of the file to create in the bucket.
+ * @param {stream} stream     The stream of the file to upload.
+ * @returns {object}          The file upload details from Google.
+ */
 exports.upload = async (bucket, fileName, stream) => utils.asyncStream(stream.pipe(
   gcs
     .bucket(bucket)

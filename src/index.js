@@ -22,6 +22,10 @@ app.use((req, res, next) => {
     return res.status(401).send({ error: 'authentication required' });
   }
 
+  if (req.path !== '/status' && !req.file) {
+    return res.status(400).send({ error: 'missing file' });
+  }
+
   try {
     return next();
   } catch (ex) {
