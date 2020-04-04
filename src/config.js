@@ -2,6 +2,7 @@ const { join } = require('path');
 
 exports.port = process.env.PORT || 80;
 exports.secret = process.env.SECRET;
+exports.maxSize = process.env.MAX_SIZE || 100;
 exports.google = {
   bucket: {
     files: process.env.FILE_BUCKET,

@@ -1,3 +1,4 @@
+const fs = require('fs');
 const config = require('./config');
 const utils = require('./utils');
 const gcs = require('./gcs');
@@ -5,19 +6,62 @@ const mux = require('./mux');
 
 const allowedFiles = {
   image: ['.jpg', '.jpeg', '.bmp', '.png', '.gif'],
-  video: ['.mov', '.mp4', '.webm', '.avi'],
+  video: ['.mov', '.mp4', '.webm', '.avi', '.mkv'],
+};
+
+/**
+ * Takes a file in arbitrary format and, if necessary, creates a startBuffer and stream object.
+ *
+ * @async
+ * @param {object}    Original file object from upload. Must contain either buffer or path.
+ * @returns {object}  Original object with startBuffer and stream set. startBuffer contains the first 2k of the file.
+ */
+const processFile = async ({
+  stream, buffer, path, ...rest
+}) => {
+  // File was already processed
+  if (stream && rest.startBuffer) {
+    return {
+      startBuffer: rest.startBuffer,
+      buffer,
+      stream,
+      ...rest,
+    };
+  }
+
+  // File is in-memory
+  if (buffer) {
+    return {
+      startBuffer: buffer,
+      buffer,
+      stream: utils.bufferToStream(buffer),
+      ...rest,
+    };
+  }
+
+  const handle = await fs.promises.open(path, 'r');
+  const startBuffer = await handle.read(Buffer.alloc(2048), 0, 2048, 0);
+  await handle.close();
+
+  return {
+    startBuffer,
+    buffer: null,
+    stream: fs.createReadStream(path),
+    ...rest,
+  };
 };
 
 /**
  * Uploads an arbitrary file.
  *
  * @async
- * @param {Buffer} file   The file to upload.
- * @returns {object}      File details: id and url.
+ * @param {Buffer} originalFile   The file to upload.
+ * @returns {object}              File details: id and url.
  */
-exports.file = async (file) => {
+exports.file = async (originalFile) => {
+  const file = await processFile(originalFile);
   const fileName = utils.makeFileName(file);
-  await gcs.upload(config.google.bucket.files, fileName, utils.bufferToStream(file.buffer));
+  await gcs.upload(config.google.bucket.files, fileName, file.stream);
 
   return {
     id: fileName,
@@ -29,10 +73,12 @@ exports.file = async (file) => {
  * Uploads an image file.
  *
  * @async
- * @param {Buffer} file   The image to upload.
- * @returns {object}      File details: id, url, and resizeUrl.
+ * @param {Buffer} originalFile   The file to upload.
+ * @returns {object}              File details: id, url, and resizeUrl.
  */
-exports.image = async (file) => {
+exports.image = async (originalFile) => {
+  const file = await processFile(originalFile);
+
   // Validate upload
   const ext = utils.getFileExt(file);
   if (allowedFiles.image.indexOf(ext) === -1) {
@@ -42,7 +88,7 @@ exports.image = async (file) => {
   }
 
   const fileName = utils.makeFileName(file);
-  await gcs.upload(config.google.bucket.images, fileName, utils.bufferToStream(file.buffer));
+  await gcs.upload(config.google.bucket.images, fileName, file.stream);
 
   return {
     id: fileName,
@@ -55,10 +101,12 @@ exports.image = async (file) => {
  * Uploads a video.
  *
  * @async
- * @param {Buffer} file   The file to upload.
- * @returns {object}      File details: id, sourceId, url, stream, image, and animatedImage.
+ * @param {Buffer} originalFile   The file to upload.
+ * @returns {object}              File details: id, sourceId, url, stream, image, and animatedImage.
  */
-exports.video = async (file) => {
+exports.video = async (originalFile) => {
+  const file = await processFile(originalFile);
+
   // Validate upload
   const ext = utils.getFileExt(file);
   if (allowedFiles.video.indexOf(ext) === -1) {
