@@ -68,7 +68,6 @@ const mimeToExt = (mime) => ({
  * @returns {string}      The guessed extension, or empty-string.
  */
 module.exports.getFileExt = (file) => {
-  console.log(file);
   const { originalname: originalName, mimetype: originalMime, buffer } = file;
   const originalExt = path.extname(originalName).toLowerCase();
   if (originalExt) return originalExt;

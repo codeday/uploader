@@ -36,17 +36,39 @@ app.use((req, res, next) => {
 app.get('/status', (_, res) => res.send({ status: 'ok' }));
 
 app.post('/', async (req, res) => {
-  res.send(await upload.file(req.file));
+  try {
+    const result = await upload.file(req.file);
+    console.log(`file:${result.id}`);
+    res.send(result);
+  } catch (ex) {
+    console.error(ex);
+    res.send({ error: 'unknown' });
+  }
 });
 
 app.post('/video', async (req, res) => {
-  res.send(await upload.video(req.file));
+  try {
+    const result = await upload.video(req.file);
+    console.log(`video:${result.id}`);
+    res.send(result);
+  } catch (ex) {
+    console.error(ex);
+    res.send({ error: 'unknown' });
+  }
 });
 
 app.post('/image', async (req, res) => {
-  res.send(await upload.image(req.file));
+  try {
+    const result = await upload.image(req.file);
+    console.log(`image:${result.id}`);
+    res.send(result);
+  } catch (ex) {
+    console.error(ex);
+    res.send({ error: 'unknown' });
+  }
 });
 
 app.listen(config.port, () => {
+  // eslint-disable-next-line no-console
   console.log(`🚀  To the moon! https://0.0.0.0/${config.port}`);
 });
