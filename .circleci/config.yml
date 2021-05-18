@@ -21,6 +21,7 @@ jobs:
       - checkout
       - setup_remote_docker:
           docker_layer_caching: true
+          version: 20.10.2
       - run: |
           TAG=$CIRCLE_SHA1
           DOCKER_REPO=$CIRCLE_PROJECT_USERNAME/$CIRCLE_PROJECT_REPONAME
@@ -39,6 +40,7 @@ jobs:
       - checkout
       - setup_remote_docker:
           docker_layer_caching: true
+          version: 20.10.2
       - run: |
           TAG=$CIRCLE_SHA1
           DOCKER_REPO=$CIRCLE_PROJECT_USERNAME/$CIRCLE_PROJECT_REPONAME
