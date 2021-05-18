@@ -6,7 +6,7 @@ const mux = require('./mux');
 
 const allowedFiles = {
   image: ['.jpg', '.jpeg', '.bmp', '.png', '.gif'],
-  video: ['.mov', '.mp4', '.webm', '.avi', '.mkv'],
+  video: ['.mov', '.mp4', '.webm', '.avi', '.mkv', '.ogg', '.mp3', '.mp4', 'wav'],
 };
 
 /**
