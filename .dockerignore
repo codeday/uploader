@@ -1,3 +1,8 @@
-node_modules/
-google.json
 .env
+.env.*
+prisma/.env
+.next/
+generated/
+.eslint*
+README.md
+node_modules/

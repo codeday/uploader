@@ -36,6 +36,7 @@ app.use((req, res, next) => {
 app.get('/status', (_, res) => res.send({ status: 'ok' }));
 
 app.post('/', async (req, res) => {
+  console.log('file');
   try {
     const result = await upload.file(req.file);
     console.log(`file:${result.id}`);
@@ -47,6 +48,7 @@ app.post('/', async (req, res) => {
 });
 
 app.post('/video', async (req, res) => {
+  console.log('video');
   try {
     const result = await upload.video(req.file);
     console.log(`video:${result.id}`);
@@ -58,6 +60,7 @@ app.post('/video', async (req, res) => {
 });
 
 app.post('/image', async (req, res) => {
+  console.log('image');
   try {
     const result = await upload.image(req.file);
     console.log(`image:${result.id}`);
